@@ -17,7 +17,7 @@ Everything left of Datadog runs on the s390x VM. Only the Collector talks to Dat
 
 **Time needed:** about 60 to 90 minutes, starting from a running RHEL s390x VM.
 
-**Versions used in this demo:** OTel Collector contrib v0.162.0, node_exporter v1.12.0, CockroachDB v26.2.5. Newer versions should work; check that each release still publishes an s390x build.
+**Versions used in this demo:** OTel Collector contrib v0.162.0, node_exporter v1.12.0, CockroachDB v26.2.5.
 
 ### Files in this repo
 
