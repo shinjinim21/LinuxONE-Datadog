@@ -1,0 +1,157 @@
+{
+  "title": "LinuxONE + CockroachDB (OTel Collector)",
+  "description": "Host, Prometheus (node_exporter), CockroachDB and load-generator metrics from an s390x VM, collected by the OpenTelemetry Collector and sent with the Datadog exporter (no Datadog Agent).",
+  "layout_type": "ordered",
+  "template_variables": [
+    { "name": "host", "prefix": "host", "available_values": [], "default": "*" }
+  ],
+  "widgets": [
+    {
+      "definition": {
+        "type": "group",
+        "title": "Workload results (client view)",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Read p99 latency (ms)",
+              "requests": [ { "q": "p99:workload_kv_read_duration_seconds{$host} * 1000", "aggregator": "last" } ],
+              "precision": 2
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Write p99 latency (ms)",
+              "requests": [ { "q": "p99:workload_kv_write_duration_seconds{$host} * 1000", "aggregator": "last" } ],
+              "precision": 2
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Read latency p50 / p95 / p99 (ms)",
+              "show_legend": true,
+              "requests": [
+                { "q": "p50:workload_kv_read_duration_seconds{$host} * 1000", "display_type": "line" },
+                { "q": "p95:workload_kv_read_duration_seconds{$host} * 1000", "display_type": "line" },
+                { "q": "p99:workload_kv_read_duration_seconds{$host} * 1000", "display_type": "line" }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Write latency p50 / p95 / p99 (ms)",
+              "show_legend": true,
+              "requests": [
+                { "q": "p50:workload_kv_write_duration_seconds{$host} * 1000", "display_type": "line" },
+                { "q": "p95:workload_kv_write_duration_seconds{$host} * 1000", "display_type": "line" },
+                { "q": "p99:workload_kv_write_duration_seconds{$host} * 1000", "display_type": "line" }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "title": "CockroachDB (database view)",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "SQL queries / sec",
+              "requests": [ { "q": "sum:sql_query_count{$host}.as_rate()", "aggregator": "avg" } ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Live nodes",
+              "requests": [ { "q": "max:liveness_livenodes{$host}", "aggregator": "last" } ],
+              "precision": 0
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "SQL statements / sec by type",
+              "show_legend": true,
+              "requests": [
+                { "q": "sum:sql_select_count{$host}.as_rate()", "display_type": "line" },
+                { "q": "sum:sql_insert_count{$host}.as_rate()", "display_type": "line" },
+                { "q": "sum:sql_update_count{$host}.as_rate()", "display_type": "line" }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "SQL service latency p99 (ms, server side)",
+              "requests": [ { "q": "p99:sql_service_latency{$host} / 1000000", "display_type": "line" } ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "title": "LinuxONE host (s390x)",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "CPU utilization % by state (steal = hypervisor contention)",
+              "show_legend": true,
+              "requests": [ { "q": "avg:system.cpu.utilization{$host,!state:idle} by {state} * 100", "display_type": "area" } ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Memory used %",
+              "requests": [ { "q": "avg:system.memory.utilization{$host,state:used} * 100", "display_type": "line" } ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Load average (1m)",
+              "requests": [ { "q": "avg:system.cpu.load_average.1m{$host}", "display_type": "line" } ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Network bytes / sec",
+              "show_legend": true,
+              "requests": [ { "q": "sum:system.network.io{$host} by {direction}.as_rate()", "display_type": "line" } ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Filesystem used % by mount",
+              "show_legend": true,
+              "requests": [ { "q": "avg:system.filesystem.utilization{$host} by {mountpoint} * 100", "display_type": "line" } ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "node_exporter load1 (Prometheus path)",
+              "requests": [ { "q": "avg:node_load1{$host}", "display_type": "line" } ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
