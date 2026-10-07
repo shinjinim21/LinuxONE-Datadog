@@ -352,7 +352,7 @@ Each log line covers one second: **ops/sec(inst)** is throughput and **p50(ms) /
 
 Latency metrics arrive as Datadog **distributions**. To see p95 or p99:
 
-1. Open **Metrics → Summary**, search the metric, and enable percentiles.
+1. Open **Metrics → Summary**, search for the specific metric you are looking for (i.e. 'workload_kv_read_duration_seconds' or `workload_kv_write_duration_seconds`, and enable percentiles for the specific metric. You have to do this for every metric you wish to see percentile data for. 
 2. Start a **new** workload run. Percentiles only apply to data received after they are enabled.
 3. In Metrics Explorer, choose **p95** or **p99** as the aggregation. Values are in seconds; add a formula `a * 1000` to show milliseconds.
 
